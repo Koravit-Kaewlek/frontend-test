@@ -7,6 +7,7 @@ export const AppContext = createContext({});
 
 export const AppContextProvider = ({ children }) => {
   const [openRecordDialog, setOpenRecordDialog] = useState(false);
+  const [dataFavorite, setDataFavorite] = useState([]);
   const [jokes, setJokes] = useState({
     length: 100,
     isSuccess: null,
@@ -16,10 +17,6 @@ export const AppContextProvider = ({ children }) => {
     prevClick: 'refresh',
   });
   const fetchData = async () => {
-    console.log(
-      'fetch at time: ',
-      new Date(Date.now()).toLocaleString('th-TH')
-    );
     setJokes({ ...jokes, isLoading: true, data: [] });
     const result = await getJokes();
     const total = await getTotalJoke();
@@ -27,7 +24,7 @@ export const AppContextProvider = ({ children }) => {
       setJokes({
         ...jokes,
         isSuccess: true,
-        data: [...result.value].slice(0, jokes.length),
+        data: await setFavorite([...result.value].slice(0, jokes.length)),
         isLoading: false,
         total: total.value,
         prevClick: 'refresh',
@@ -48,7 +45,7 @@ export const AppContextProvider = ({ children }) => {
       setJokes({
         ...jokes,
         isSuccess: true,
-        data: result.value,
+        data: await setFavorite(result.value),
         isLoading: false,
         total: total.value,
         prevClick: 'random',
@@ -60,6 +57,36 @@ export const AppContextProvider = ({ children }) => {
         isLoading: false,
       });
     }
+  };
+  const setFavorite = async (arr = []) => {
+    return await arr.map((item) => {
+      if (dataFavorite.findIndex((f) => f.id === item.id) !== -1) {
+        return { ...item, isFavorite: !item?.isFavorite };
+      } else {
+        return item;
+      }
+    });
+  };
+  const handleAddFavorite = async (data) => {
+    if (dataFavorite.findIndex((f) => f.id === data.id) === -1) {
+      await setDataFavorite([...dataFavorite, data]);
+    } else {
+      await setDataFavorite(
+        dataFavorite.filter((item) => {
+          return item.id !== data.id;
+        })
+      );
+    }
+    await setJokes({
+      ...jokes,
+      data: jokes.data.map((item) => {
+        if (item.id === data.id) {
+          return { ...item, isFavorite: !item?.isFavorite };
+        } else {
+          return item;
+        }
+      }),
+    });
   };
   const handleDisplayLength = async (length) => {
     await setJokes({ ...jokes, length });
@@ -96,6 +123,8 @@ export const AppContextProvider = ({ children }) => {
     handleOpenRecordDialog,
     handleCloseRecordDialog,
     handleDisplayLength,
+    dataFavorite,
+    handleAddFavorite,
   };
   return <AppContext.Provider value={store}>{children}</AppContext.Provider>;
 };

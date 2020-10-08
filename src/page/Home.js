@@ -22,7 +22,7 @@ import {
 } from '@material-ui/icons';
 import SentimentVerySatisfiedOutlinedIcon from '@material-ui/icons/SentimentVerySatisfiedOutlined';
 import ShuffleOutlinedIcon from '@material-ui/icons/ShuffleOutlined';
-import { green, orange } from '@material-ui/core/colors';
+import { green, grey, orange } from '@material-ui/core/colors';
 import RecordDialog from './RecordDialog';
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,9 +38,8 @@ const useStyles = makeStyles((theme) => ({
     overflowY: 'auto',
   },
   listItem: {
-    cursor: 'pointer',
     '&:hover': {
-      background: theme.palette.divider,
+      background: grey[200],
     },
   },
   loading: {
@@ -79,6 +78,7 @@ export default function Home() {
     handleRefresh,
     handleRandom,
     handleOpenRecordDialog,
+    handleAddFavorite,
   } = useContext(AppContext);
 
   return (
@@ -137,7 +137,7 @@ export default function Home() {
               <React.Fragment key={item.id}>
                 <ListItem className={classes.listItem}>
                   <ListItemText primary={`${index + 1}.  ${item.joke}`} />
-                  <IconButton>
+                  <IconButton onClick={() => handleAddFavorite(item)}>
                     {item?.isFavorite ? (
                       <Favorite htmlColor="red" />
                     ) : (
