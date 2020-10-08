@@ -6,7 +6,7 @@
 ## Start project
 `npm start`
 
-### Front-end Questions
+## Front-end Questions
 
 1. Explain the what's similar & difference between `cookie` / `localStorage` / `sessionStorage`.
 
